@@ -42,9 +42,63 @@ document.querySelectorAll('[data-toast-messages] [data-toast-type]').forEach((me
 	}).showToast();
 });
 
-document.querySelectorAll('form[data-blob-upload="true"]').forEach((form) => {
+const maxImageDimension = 1920;
+const imageQuality = 0.82;
+
+async function compressImage(file) {
+	if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+		throw new Error('Pilih foto berformat JPEG, PNG, atau WebP.');
+	}
+
+	if (typeof createImageBitmap !== 'function') {
+		throw new Error('Browser ini tidak mendukung kompresi foto. Coba gunakan browser versi terbaru.');
+	}
+
+	const image = await createImageBitmap(file);
+
+	try {
+		const scale = Math.min(1, maxImageDimension / Math.max(image.width, image.height));
+		const width = Math.max(1, Math.round(image.width * scale));
+		const height = Math.max(1, Math.round(image.height * scale));
+		const canvas = document.createElement('canvas');
+
+		canvas.width = width;
+		canvas.height = height;
+
+		const context = canvas.getContext('2d');
+
+		if (!context) {
+			throw new Error('Browser tidak dapat memproses foto ini.');
+		}
+
+		context.drawImage(image, 0, 0, width, height);
+
+		const compressed = await new Promise((resolve) => {
+			canvas.toBlob(resolve, 'image/webp', imageQuality);
+		});
+
+		if (!compressed || compressed.type !== 'image/webp') {
+			throw new Error('Browser gagal mengompresi foto ke WebP.');
+		}
+
+		if (scale === 1 && compressed.size >= file.size) {
+			return file;
+		}
+
+		const filename = `${file.name.replace(/\.[^.]+$/, '')}.webp`;
+
+		return new File([compressed], filename, {
+			type: 'image/webp',
+			lastModified: file.lastModified,
+		});
+	} finally {
+		image.close();
+	}
+}
+
+document.querySelectorAll('form[data-blob-upload]').forEach((form) => {
 	form.addEventListener('submit', async (event) => {
-		if (form.dataset.blobReady === 'true') {
+		if (form.dataset.uploadReady === 'true') {
 			return;
 		}
 
@@ -61,13 +115,29 @@ document.querySelectorAll('form[data-blob-upload="true"]').forEach((form) => {
 		const submitButtons = [...form.querySelectorAll('button[type="submit"]')];
 		submitButtons.forEach((button) => {
 			button.disabled = true;
+			button.dataset.originalLabel = button.textContent;
+			button.textContent = 'Mengompresi foto...';
 		});
 
 		try {
 			for (const { input, file } of uploads) {
+				const compressedFile = await compressImage(file);
+				const maxSize = input.dataset.blobFolder === 'hero' ? 10 : 5;
+
+				if (compressedFile.size > maxSize * 1024 * 1024) {
+					throw new Error(`Ukuran foto setelah dikompresi masih melebihi ${maxSize} MB.`);
+				}
+
+				if (form.dataset.blobUpload !== 'true') {
+					const transfer = new DataTransfer();
+					transfer.items.add(compressedFile);
+					input.files = transfer.files;
+					continue;
+				}
+
 				const folder = input.dataset.blobFolder;
-				const safeName = file.name.replace(/[^A-Za-z0-9._-]/g, '-');
-				const blob = await upload(`uploads/${folder}/${Date.now()}-${safeName}`, file, {
+				const safeName = compressedFile.name.replace(/[^A-Za-z0-9._-]/g, '-');
+				const blob = await upload(`uploads/${folder}/${Date.now()}-${safeName}`, compressedFile, {
 					access: 'public',
 					handleUploadUrl: '/api/blob-upload',
 				});
@@ -78,9 +148,12 @@ document.querySelectorAll('form[data-blob-upload="true"]').forEach((form) => {
 				url.value = blob.url;
 				form.append(url);
 				input.disabled = true;
+				submitButtons.forEach((button) => {
+					button.textContent = 'Mengunggah foto...';
+				});
 			}
 
-			form.dataset.blobReady = 'true';
+			form.dataset.uploadReady = 'true';
 			form.requestSubmit();
 		} catch (error) {
 			Toastify({
@@ -96,6 +169,8 @@ document.querySelectorAll('form[data-blob-upload="true"]').forEach((form) => {
 
 			submitButtons.forEach((button) => {
 				button.disabled = false;
+				button.textContent = button.dataset.originalLabel;
+				delete button.dataset.originalLabel;
 			});
 		}
 	});

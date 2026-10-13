@@ -374,7 +374,7 @@ class HmveController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'jabatan' => 'required|string|max:255',
-            'foto' => 'nullable|image|mimes:png,jpg,jpeg|max:5120',
+            'foto' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:5120',
         ]);
 
         $this->data->create('pembinas', [
@@ -398,7 +398,7 @@ class HmveController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'posisi' => 'required|in:Ketua Himpunan,Wakil Ketua Himpunan',
-            'foto' => 'nullable|image|mimes:png,jpg,jpeg|max:5120',
+            'foto' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:5120',
         ]);
 
         $this->data->create('pimpinans', [
@@ -432,7 +432,7 @@ class HmveController extends Controller
             'nama' => 'required|string|max:255',
             'jabatan' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
-            'foto' => 'nullable|image|mimes:png,jpg,jpeg|max:5120',
+            'foto' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:5120',
         ]);
 
         $this->data->create('anggotas', [

@@ -43,14 +43,8 @@ export default async function handler(request, response) {
 					throw new Error('The requested upload path is not allowed.');
 				}
 
-				const allowedContentTypes = ['image/jpeg', 'image/png'];
-
-				if (['hero', 'unit', 'publikasi'].includes(match[1])) {
-					allowedContentTypes.push('image/webp');
-				}
-
 				return {
-					allowedContentTypes,
+					allowedContentTypes: ['image/jpeg', 'image/png', 'image/webp'],
 					maximumSizeInBytes: match[1] === 'hero' ? maxUploadSize : 5 * 1024 * 1024,
 					addRandomSuffix: true,
 				};

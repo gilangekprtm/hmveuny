@@ -72,7 +72,10 @@ class PhotoUploadTest extends TestCase
         try {
             foreach ($uploads as $upload) {
                 $response = $this->post(route($upload['route']), $upload['data'] + [
-                    'foto' => UploadedFile::fake()->image('foto.png'),
+                    'foto' => UploadedFile::fake()->createWithContent(
+                        'foto.webp',
+                        base64_decode('UklGRhwAAABXRUJQVlA4TA8AAAAvAAAAEAcQ/Y8CBiKi/wEA', true),
+                    ),
                 ]);
 
                 $response->assertRedirect(route('admin.dashboard', ['tab' => $upload['tab']]));

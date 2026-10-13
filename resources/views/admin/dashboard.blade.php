@@ -164,7 +164,7 @@
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-400 mb-2">Upload Foto (Format PNG Transparan)</label>
-                            <input type="file" name="foto" accept="image/png, image/jpeg" data-blob-folder="pembina" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-yellow-500 file:text-black hover:file:bg-yellow-400">
+                            <input type="file" name="foto" accept="image/png, image/jpeg, image/webp" data-blob-folder="pembina" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-yellow-500 file:text-black hover:file:bg-yellow-400">
                         </div>
                         <button type="submit" class="w-full bg-yellow-500 text-black font-bold py-2 rounded hover:bg-yellow-400 transition">Simpan Pembina</button>
                     </form>
@@ -219,7 +219,7 @@
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-400 mb-2">Upload Foto (Format PNG Transparan)</label>
-                            <input type="file" name="foto" accept="image/png, image/jpeg" data-blob-folder="pimpinan" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-yellow-500 file:text-black hover:file:bg-yellow-400">
+                            <input type="file" name="foto" accept="image/png, image/jpeg, image/webp" data-blob-folder="pimpinan" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-yellow-500 file:text-black hover:file:bg-yellow-400">
                         </div>
                         <button type="submit" class="w-full bg-yellow-500 text-black font-bold py-2 rounded hover:bg-yellow-400 transition">Simpan Pimpinan</button>
                     </form>
@@ -288,7 +288,7 @@
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-400 mb-2">Upload Foto (Format PNG Transparan)</label>
-                            <input type="file" name="foto" accept="image/png, image/jpeg" data-blob-folder="anggota" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-yellow-500 file:text-black hover:file:bg-yellow-400">
+                            <input type="file" name="foto" accept="image/png, image/jpeg, image/webp" data-blob-folder="anggota" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-yellow-500 file:text-black hover:file:bg-yellow-400">
                         </div>
                         <button type="submit" class="w-full bg-yellow-500 text-black font-bold py-2 rounded hover:bg-yellow-400 transition">Simpan Anggota</button>
                     </form>
