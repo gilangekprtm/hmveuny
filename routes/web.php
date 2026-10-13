@@ -46,9 +46,11 @@ Route::prefix('control-panel')->middleware(EnsureAdminAuthenticated::class)->gro
 
     // Pimpinan (Ketua & Wakil)
     Route::post('/pimpinan', [HmveController::class, 'storePimpinan'])->name('admin.pimpinan.store');
+    Route::put('/pimpinan/{id}', [HmveController::class, 'updatePimpinan'])->name('admin.pimpinan.update');
     Route::delete('/pimpinan/{id}', [HmveController::class, 'destroyPimpinan'])->name('admin.pimpinan.destroy');
 
     // Anggota (Biro & Divisi)
     Route::post('/anggota', [HmveController::class, 'storeAnggota'])->name('admin.anggota.store');
+    Route::put('/anggota/{id}', [HmveController::class, 'updateAnggota'])->name('admin.anggota.update');
     Route::delete('/anggota/{id}', [HmveController::class, 'destroyAnggota'])->name('admin.anggota.destroy');
 });

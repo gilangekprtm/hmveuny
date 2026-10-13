@@ -154,6 +154,129 @@ class ContentManagementTest extends TestCase
             ->assertSee('Teknik Informatika');
     }
 
+    public function test_admin_can_edit_president_and_unit_leader_and_staff_records(): void
+    {
+        $admin = $this->createAdmin();
+        $this->actingAs($admin);
+
+        $unit = app(JsonStore::class)->create('units', [
+            'nama' => 'Biro Pengujian',
+            'slug' => 'biro-pengujian',
+            'kategori' => 'Biro',
+            'deskripsi' => 'Biro untuk pengujian.',
+        ]);
+        $otherUnit = app(JsonStore::class)->create('units', [
+            'nama' => 'Divisi Pengujian',
+            'slug' => 'divisi-pengujian',
+            'kategori' => 'Divisi',
+            'deskripsi' => 'Divisi untuk pengujian.',
+        ]);
+        $president = app(JsonStore::class)->create('pimpinans', [
+            'nama' => 'Ketua Lama',
+            'posisi' => 'Ketua Himpunan',
+            'prodi' => 'Prodi Lama',
+            'image_url' => 'uploads/pimpinan/current.webp',
+        ]);
+        $leader = app(JsonStore::class)->create('anggotas', [
+            'unit_id' => $unit->id,
+            'nama' => 'Kepala Lama',
+            'jabatan' => 'Kepala Biro',
+            'prodi' => 'Prodi Lama',
+            'deskripsi' => 'Deskripsi lama kepala.',
+            'image_url' => 'uploads/anggota/leader.webp',
+        ]);
+        $staff = app(JsonStore::class)->create('anggotas', [
+            'unit_id' => $unit->id,
+            'nama' => 'Staf Lama',
+            'jabatan' => 'Staff',
+            'prodi' => 'Prodi Lama',
+            'deskripsi' => 'Deskripsi lama staf.',
+            'image_url' => 'uploads/anggota/staff.webp',
+        ]);
+
+        $this->get(route('admin.dashboard', ['tab' => 'pimpinan', 'edit_pimpinan' => $president->id]))
+            ->assertOk()
+            ->assertSee('Edit Ketua / Wakil')
+            ->assertSee('value="Ketua Lama"', false)
+            ->assertSee('value="Prodi Lama"', false)
+            ->assertSee(route('admin.pimpinan.update', $president->id));
+        $this->get(route('admin.dashboard', ['tab' => 'anggota', 'edit_anggota' => $leader->id]))
+            ->assertOk()
+            ->assertSee('Edit Anggota Biro / Divisi')
+            ->assertSee('value="Kepala Lama"', false)
+            ->assertSee(route('admin.anggota.update', $leader->id));
+        $this->get(route('admin.dashboard', ['tab' => 'anggota']))
+            ->assertSee(route('admin.dashboard', ['tab' => 'anggota', 'edit_anggota' => $staff->id]));
+
+        $this->put(route('admin.pimpinan.update', $president->id), [
+            'nama' => 'Ketua Baru',
+            'posisi' => 'Wakil Ketua Himpunan',
+            'prodi' => 'Teknik Elektro',
+        ])->assertRedirect(route('admin.dashboard', ['tab' => 'pimpinan']));
+
+        $this->put(route('admin.anggota.update', $leader->id), [
+            'unit_id' => $otherUnit->id,
+            'nama' => 'Kepala Baru',
+            'jabatan' => 'Kepala Divisi',
+            'prodi' => 'Teknik Elektronika',
+            'deskripsi' => 'Deskripsi baru kepala.',
+        ])->assertRedirect(route('admin.dashboard', ['tab' => 'anggota']));
+
+        $this->put(route('admin.anggota.update', $staff->id), [
+            'unit_id' => $unit->id,
+            'nama' => 'Staf Baru',
+            'jabatan' => 'Staff Administrasi',
+            'prodi' => 'Teknik Informatika',
+            'deskripsi' => 'Deskripsi baru staf.',
+        ])->assertRedirect(route('admin.dashboard', ['tab' => 'anggota']));
+
+        $updatedPresident = app(JsonStore::class)->find('pimpinans', $president->id);
+        $this->assertSame('Ketua Baru', $updatedPresident->nama);
+        $this->assertSame('Wakil Ketua Himpunan', $updatedPresident->posisi);
+        $this->assertSame('Teknik Elektro', $updatedPresident->prodi);
+        $this->assertSame('uploads/pimpinan/current.webp', $updatedPresident->image_url);
+
+        $updatedLeader = app(JsonStore::class)->find('anggotas', $leader->id);
+        $this->assertSame('Kepala Baru', $updatedLeader->nama);
+        $this->assertSame('Kepala Divisi', $updatedLeader->jabatan);
+        $this->assertSame((int) $otherUnit->id, $updatedLeader->unit_id);
+        $this->assertSame('Teknik Elektronika', $updatedLeader->prodi);
+        $this->assertSame('Deskripsi baru kepala.', $updatedLeader->deskripsi);
+        $this->assertSame('uploads/anggota/leader.webp', $updatedLeader->image_url);
+
+        $updatedStaff = app(JsonStore::class)->find('anggotas', $staff->id);
+        $this->assertSame('Staf Baru', $updatedStaff->nama);
+        $this->assertSame('Staff Administrasi', $updatedStaff->jabatan);
+        $this->assertSame('Teknik Informatika', $updatedStaff->prodi);
+        $this->assertSame('Deskripsi baru staf.', $updatedStaff->deskripsi);
+        $this->assertSame('uploads/anggota/staff.webp', $updatedStaff->image_url);
+
+        $this->get(route('unit.detail', $otherUnit->slug))
+            ->assertOk()
+            ->assertSee('Kepala Baru')
+            ->assertSee('Teknik Elektronika');
+        $this->get(route('unit.detail', $unit->slug))
+            ->assertOk()
+            ->assertSee('Staf Baru')
+            ->assertSee('Teknik Informatika');
+    }
+
+    public function test_admin_cannot_update_missing_pimpinan_or_anggota_records(): void
+    {
+        $this->actingAs($this->createAdmin());
+
+        $this->put(route('admin.pimpinan.update', 999), [
+            'nama' => 'Tidak Ada',
+            'posisi' => 'Ketua Himpunan',
+        ])->assertNotFound();
+
+        $this->put(route('admin.anggota.update', 999), [
+            'unit_id' => 1,
+            'nama' => 'Tidak Ada',
+            'jabatan' => 'Staff',
+        ])->assertNotFound();
+    }
+
     private function createAdmin(): User
     {
         $record = app(JsonStore::class)->create('users', [

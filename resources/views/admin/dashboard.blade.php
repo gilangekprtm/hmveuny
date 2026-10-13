@@ -203,29 +203,38 @@
             @elseif($tab == 'pimpinan')
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-lg h-fit">
-                    <h3 class="text-lg font-bold text-yellow-500 mb-4 border-b border-zinc-800 pb-2">Tambah Ketua / Wakil</h3>
-                    <form action="{{ route('admin.pimpinan.store') }}" method="POST" enctype="multipart/form-data" data-blob-upload="{{ config('uploads.driver') === 'vercel' ? 'true' : 'false' }}">
+                    <h3 class="text-lg font-bold text-yellow-500 mb-4 border-b border-zinc-800 pb-2">{{ $editingPimpinan ? 'Edit Ketua / Wakil' : 'Tambah Ketua / Wakil' }}</h3>
+                    <form action="{{ $editingPimpinan ? route('admin.pimpinan.update', $editingPimpinan->id) : route('admin.pimpinan.store') }}" method="POST" enctype="multipart/form-data" data-blob-upload="{{ config('uploads.driver') === 'vercel' ? 'true' : 'false' }}">
                         @csrf
+                        @if($editingPimpinan)
+                        @method('PUT')
+                        @endif
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-400 mb-2">Nama Lengkap</label>
-                            <input type="text" name="nama" required class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none" placeholder="Nama Mahasiswa">
+                            <input type="text" name="nama" value="{{ old('nama', $editingPimpinan?->nama) }}" required class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none" placeholder="Nama Mahasiswa">
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-400 mb-2">Posisi</label>
                             <select name="posisi" class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none">
-                                <option value="Ketua Himpunan">Ketua Himpunan</option>
-                                <option value="Wakil Ketua Himpunan">Wakil Ketua Himpunan</option>
+                                <option value="Ketua Himpunan" @selected(old('posisi', $editingPimpinan?->posisi) === 'Ketua Himpunan')>Ketua Himpunan</option>
+                                <option value="Wakil Ketua Himpunan" @selected(old('posisi', $editingPimpinan?->posisi) === 'Wakil Ketua Himpunan')>Wakil Ketua Himpunan</option>
                             </select>
                         </div>
                         <div class="mb-4">
                             <label for="pimpinan_prodi" class="block text-sm font-medium text-gray-400 mb-2">Program Studi (Opsional)</label>
-                            <input id="pimpinan_prodi" type="text" name="prodi" value="{{ old('prodi') }}" maxlength="255" class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none" placeholder="Contoh: Teknik Elektro">
+                            <input id="pimpinan_prodi" type="text" name="prodi" value="{{ old('prodi', $editingPimpinan?->prodi) }}" maxlength="255" class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none" placeholder="Contoh: Teknik Elektro">
                         </div>
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-400 mb-2">Upload Foto (Format PNG Transparan)</label>
+                            @if($editingPimpinan?->image_url)
+                            <img src="{{ filter_var($editingPimpinan->image_url, FILTER_VALIDATE_URL) ? $editingPimpinan->image_url : asset($editingPimpinan->image_url) }}" alt="Foto {{ $editingPimpinan->nama }}" class="mb-3 h-24 w-24 rounded border border-zinc-700 object-cover">
+                            @endif
+                            <label class="block text-sm font-medium text-gray-400 mb-2">{{ $editingPimpinan?->image_url ? 'Ganti Foto (Opsional)' : 'Upload Foto (Format PNG Transparan)' }}</label>
                             <input type="file" name="foto" accept="image/png, image/jpeg, image/webp" data-blob-folder="pimpinan" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-yellow-500 file:text-black hover:file:bg-yellow-400">
                         </div>
-                        <button type="submit" class="w-full bg-yellow-500 text-black font-bold py-2 rounded hover:bg-yellow-400 transition">Simpan Pimpinan</button>
+                        <button type="submit" class="w-full bg-yellow-500 text-black font-bold py-2 rounded hover:bg-yellow-400 transition">{{ $editingPimpinan ? 'Perbarui Pimpinan' : 'Simpan Pimpinan' }}</button>
+                        @if($editingPimpinan)
+                        <a href="{{ route('admin.dashboard', ['tab' => 'pimpinan']) }}" class="mt-3 block w-full rounded border border-zinc-700 py-2 text-center text-sm text-gray-300 transition hover:border-zinc-500 hover:text-white">Batal</a>
+                        @endif
                     </form>
                 </div>
                 <div class="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-lg overflow-x-auto h-fit">
@@ -244,10 +253,13 @@
                                 <td class="p-4 border-b border-zinc-800 font-medium text-white">{{ $pim->nama }}</td>
                                 <td class="p-4 border-b border-zinc-800"><span class="bg-yellow-500/10 text-yellow-500 px-2 py-1 text-xs font-bold rounded border border-yellow-500/20">{{ $pim->posisi }}</span></td>
                                 <td class="p-4 border-b border-zinc-800 text-center">
-                                    <form action="{{ route('admin.pimpinan.destroy', $pim->id) }}" method="POST" onsubmit="return confirm('Hapus data?');">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="text-red-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
-                                    </form>
+                                    <div class="flex items-center justify-center gap-4">
+                                        <a href="{{ route('admin.dashboard', ['tab' => 'pimpinan', 'edit_pimpinan' => $pim->id]) }}" aria-label="Edit {{ $pim->nama }}" class="text-yellow-500 hover:text-yellow-300"><i class="fa-solid fa-pen"></i></a>
+                                        <form action="{{ route('admin.pimpinan.destroy', $pim->id) }}" method="POST" onsubmit="return confirm('Hapus data?');">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" aria-label="Hapus {{ $pim->nama }}" class="text-red-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                             @empty
@@ -262,43 +274,54 @@
             @elseif($tab == 'anggota')
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-lg h-fit">
-                    <h3 class="text-lg font-bold text-yellow-500 mb-4 border-b border-zinc-800 pb-2">Tambah Anggota</h3>
-                    <form action="{{ route('admin.anggota.store') }}" method="POST" enctype="multipart/form-data" data-blob-upload="{{ config('uploads.driver') === 'vercel' ? 'true' : 'false' }}">
+                    <h3 class="text-lg font-bold text-yellow-500 mb-4 border-b border-zinc-800 pb-2">{{ $editingAnggota ? 'Edit Anggota Biro / Divisi' : 'Tambah Anggota' }}</h3>
+                    <form action="{{ $editingAnggota ? route('admin.anggota.update', $editingAnggota->id) : route('admin.anggota.store') }}" method="POST" enctype="multipart/form-data" data-blob-upload="{{ config('uploads.driver') === 'vercel' ? 'true' : 'false' }}">
                         @csrf
+                        @if($editingAnggota)
+                        @method('PUT')
+                        @endif
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-400 mb-2">Pilih Biro / Divisi</label>
                             <select name="unit_id" required class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none">
                                 <option value="">-- Pilih Penempatan --</option>
                                 @foreach($units as $u)
-                                <option value="{{ $u->id }}">{{ $u->nama }} ({{ $u->kategori }})</option>
+                                <option value="{{ $u->id }}" @selected((string) old('unit_id', $editingAnggota?->unit_id) === (string) $u->id)>{{ $u->nama }} ({{ $u->kategori }})</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-400 mb-2">Nama Lengkap</label>
-                            <input type="text" name="nama" required class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none" placeholder="Nama Anggota">
+                            <input type="text" name="nama" value="{{ old('nama', $editingAnggota?->nama) }}" required class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none" placeholder="Nama Anggota">
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-400 mb-2">Jabatan</label>
-                            <input type="text" name="jabatan" required class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none" placeholder="Contoh: Kepala Divisi / Staff">
+                            <input type="text" name="jabatan" value="{{ old('jabatan', $editingAnggota?->jabatan) }}" required class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none" placeholder="Contoh: Kepala Divisi / Staff">
                         </div>
                         <div class="mb-4">
                             <label for="anggota_prodi" class="block text-sm font-medium text-gray-400 mb-2">Program Studi (Opsional)</label>
-                            <input id="anggota_prodi" type="text" name="prodi" value="{{ old('prodi') }}" maxlength="255" class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none" placeholder="Contoh: Teknik Elektro">
+                            <input id="anggota_prodi" type="text" name="prodi" value="{{ old('prodi', $editingAnggota?->prodi) }}" maxlength="255" class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none" placeholder="Contoh: Teknik Elektro">
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-400 mb-2">Deskripsi Singkat</label>
-                            <textarea name="deskripsi" rows="2" class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none" placeholder="Keterangan singkat..."></textarea>
+                            <textarea name="deskripsi" rows="2" class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none" placeholder="Keterangan singkat...">{{ old('deskripsi', $editingAnggota?->deskripsi) }}</textarea>
                         </div>
+                        @unless($editingAnggota)
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-400 mb-2">URL Foto (Opsional)</label>
                             <input type="text" name="image_url" class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none" placeholder="https://...">
                         </div>
+                        @endunless
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-400 mb-2">Upload Foto (Format PNG Transparan)</label>
+                            @if($editingAnggota?->image_url)
+                            <img src="{{ filter_var($editingAnggota->image_url, FILTER_VALIDATE_URL) ? $editingAnggota->image_url : asset($editingAnggota->image_url) }}" alt="Foto {{ $editingAnggota->nama }}" class="mb-3 h-24 w-24 rounded border border-zinc-700 object-cover">
+                            @endif
+                            <label class="block text-sm font-medium text-gray-400 mb-2">{{ $editingAnggota?->image_url ? 'Ganti Foto (Opsional)' : 'Upload Foto (Format PNG Transparan)' }}</label>
                             <input type="file" name="foto" accept="image/png, image/jpeg, image/webp" data-blob-folder="anggota" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-yellow-500 file:text-black hover:file:bg-yellow-400">
                         </div>
-                        <button type="submit" class="w-full bg-yellow-500 text-black font-bold py-2 rounded hover:bg-yellow-400 transition">Simpan Anggota</button>
+                        <button type="submit" class="w-full bg-yellow-500 text-black font-bold py-2 rounded hover:bg-yellow-400 transition">{{ $editingAnggota ? 'Perbarui Anggota' : 'Simpan Anggota' }}</button>
+                        @if($editingAnggota)
+                        <a href="{{ route('admin.dashboard', ['tab' => 'anggota']) }}" class="mt-3 block w-full rounded border border-zinc-700 py-2 text-center text-sm text-gray-300 transition hover:border-zinc-500 hover:text-white">Batal</a>
+                        @endif
                     </form>
                 </div>
                 <div class="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-lg overflow-x-auto h-fit">
@@ -319,10 +342,13 @@
                                 <td class="p-4 border-b border-zinc-800 text-yellow-500 text-sm">{{ $ang->unit->nama ?? '-' }}</td>
                                 <td class="p-4 border-b border-zinc-800 text-gray-400 text-sm">{{ $ang->jabatan }}</td>
                                 <td class="p-4 border-b border-zinc-800 text-center">
-                                    <form action="{{ route('admin.anggota.destroy', $ang->id) }}" method="POST" onsubmit="return confirm('Hapus anggota ini?');">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="text-red-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
-                                    </form>
+                                    <div class="flex items-center justify-center gap-4">
+                                        <a href="{{ route('admin.dashboard', ['tab' => 'anggota', 'edit_anggota' => $ang->id]) }}" aria-label="Edit {{ $ang->nama }}" class="text-yellow-500 hover:text-yellow-300"><i class="fa-solid fa-pen"></i></a>
+                                        <form action="{{ route('admin.anggota.destroy', $ang->id) }}" method="POST" onsubmit="return confirm('Hapus anggota ini?');">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" aria-label="Hapus {{ $ang->nama }}" class="text-red-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                             @empty

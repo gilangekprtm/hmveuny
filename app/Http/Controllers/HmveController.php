@@ -154,6 +154,12 @@ class HmveController extends Controller
         $editingUnit = $request->query('edit_unit')
             ? $this->data->find('units', $request->query('edit_unit'))
             : null;
+        $editingPimpinan = $request->query('edit_pimpinan')
+            ? $this->data->find('pimpinans', $request->query('edit_pimpinan'))
+            : null;
+        $editingAnggota = $request->query('edit_anggota')
+            ? $this->data->find('anggotas', $request->query('edit_anggota'))
+            : null;
         $publications = $this->publications();
         $editingPublication = $request->query('edit')
             ? $this->data->find('publications', $request->query('edit'))
@@ -189,6 +195,8 @@ class HmveController extends Controller
             'publications',
             'editingPublication',
             'editingUnit',
+            'editingPimpinan',
+            'editingAnggota',
             'users',
             'editingUser',
             'currentUserId',
@@ -412,6 +420,28 @@ class HmveController extends Controller
         return redirect()->route('admin.dashboard', ['tab' => 'pimpinan'])->with('success', 'Data Pimpinan berhasil ditambahkan!');
     }
 
+    public function updatePimpinan(Request $request, int $id)
+    {
+        $existing = $this->data->find('pimpinans', $id);
+        abort_if($existing === null, 404);
+
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'posisi' => 'required|in:Ketua Himpunan,Wakil Ketua Himpunan',
+            'prodi' => 'nullable|string|max:255',
+            'foto' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:5120',
+        ]);
+
+        $this->data->update('pimpinans', $id, [
+            'nama' => $validated['nama'],
+            'posisi' => $validated['posisi'],
+            'prodi' => $validated['prodi'] ?? null,
+            'image_url' => $this->uploadFoto($request, 'pimpinan') ?? $existing->image_url,
+        ]);
+
+        return redirect()->route('admin.dashboard', ['tab' => 'pimpinan'])->with('success', 'Data Pimpinan berhasil diperbarui!');
+    }
+
     public function destroyPimpinan(int $id)
     {
         abort_unless($this->data->delete('pimpinans', $id), 404);
@@ -448,6 +478,40 @@ class HmveController extends Controller
         ]);
 
         return redirect()->route('admin.dashboard', ['tab' => 'anggota'])->with('success', 'Anggota berhasil ditambahkan!');
+    }
+
+    public function updateAnggota(Request $request, int $id)
+    {
+        $existing = $this->data->find('anggotas', $id);
+        abort_if($existing === null, 404);
+
+        $validated = $request->validate([
+            'unit_id' => [
+                'required',
+                'integer',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (! $this->data->find('units', $value)) {
+                        $fail('Biro atau divisi yang dipilih tidak ditemukan.');
+                    }
+                },
+            ],
+            'nama' => 'required|string|max:255',
+            'jabatan' => 'required|string|max:255',
+            'prodi' => 'nullable|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'foto' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:5120',
+        ]);
+
+        $this->data->update('anggotas', $id, [
+            'unit_id' => (int) $validated['unit_id'],
+            'nama' => $validated['nama'],
+            'jabatan' => $validated['jabatan'],
+            'prodi' => $validated['prodi'] ?? null,
+            'deskripsi' => $validated['deskripsi'] ?? null,
+            'image_url' => $this->uploadFoto($request, 'anggota') ?? $existing->image_url,
+        ]);
+
+        return redirect()->route('admin.dashboard', ['tab' => 'anggota'])->with('success', 'Data anggota berhasil diperbarui!');
     }
 
     public function destroyAnggota(int $id)
