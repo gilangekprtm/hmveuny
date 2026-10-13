@@ -2,8 +2,8 @@
 
 namespace App\Support;
 
-use Illuminate\Support\Collection;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 use UnexpectedValueException;
@@ -19,9 +19,9 @@ class JsonStore
     private const FIELDS = [
         'users' => ['name', 'email', 'password', 'level_akses', 'remember_token', 'email_verified_at'],
         'pembinas' => ['nama', 'jabatan', 'image_url'],
-        'pimpinans' => ['nama', 'posisi', 'image_url'],
+        'pimpinans' => ['nama', 'posisi', 'prodi', 'image_url'],
         'units' => ['nama', 'slug', 'kategori', 'deskripsi', 'foto_bersama'],
-        'anggotas' => ['unit_id', 'nama', 'jabatan', 'deskripsi', 'image_url'],
+        'anggotas' => ['unit_id', 'nama', 'jabatan', 'prodi', 'deskripsi', 'image_url'],
         'site_contents' => [
             'sejarah', 'visi', 'misi', 'join_title', 'join_description', 'join_label', 'join_url',
             'show_join_menu', 'contact_email', 'contact_phone', 'contact_address', 'instagram_url',

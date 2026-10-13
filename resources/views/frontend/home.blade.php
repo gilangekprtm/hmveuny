@@ -226,6 +226,9 @@
                     <div class="p-6 border-t border-zinc-800">
                         <h4 class="text-2xl font-bold text-white mb-1">{{ $pim->nama }}</h4>
                         <p class="text-yellow-500 text-sm uppercase tracking-widest font-semibold">{{ $pim->posisi }}</p>
+                        @if($pim->prodi)
+                        <p class="mt-1 text-sm text-gray-400">{{ $pim->prodi }}</p>
+                        @endif
                     </div>
                 </div>
                 @empty
@@ -255,6 +258,9 @@
                             <div>
                                 <p class="text-sm font-semibold text-white">{{ $leader->nama }}</p>
                                 <p class="text-xs text-yellow-500">{{ $leader->jabatan }}</p>
+                                @if($leader->prodi)
+                                <p class="text-xs text-gray-400">{{ $leader->prodi }}</p>
+                                @endif
                             </div>
                         </div>
                         @endforeach

@@ -49,6 +49,9 @@
                     <div class="border-t border-zinc-800 pt-4 w-full">
                         <h3 class="mb-1 break-words text-xl font-serif text-white sm:text-2xl">{{ $a->nama }}</h3>
                         <p class="text-yellow-500 text-sm uppercase tracking-wider font-semibold">{{ $a->jabatan }}</p>
+                        @if($a->prodi)
+                        <p class="mt-1 text-sm text-gray-400">{{ $a->prodi }}</p>
+                        @endif
                     </div>
                 </div>
                 @empty
@@ -72,6 +75,9 @@
                 <div class="border-t border-zinc-800 pt-4 w-full">
                     <h3 class="mb-1 break-words text-xl font-serif text-white sm:text-2xl">{{ $a->nama }}</h3>
                     <p class="text-yellow-500 text-sm uppercase tracking-wider font-semibold mb-4">{{ $a->jabatan }}</p>
+                    @if($a->prodi)
+                    <p class="mb-4 text-sm text-gray-400">{{ $a->prodi }}</p>
+                    @endif
                     <p class="text-gray-400 text-sm leading-relaxed">{{ $a->deskripsi }}</p>
                 </div>
             </div>

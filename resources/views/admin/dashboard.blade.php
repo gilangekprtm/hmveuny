@@ -218,6 +218,10 @@
                             </select>
                         </div>
                         <div class="mb-4">
+                            <label for="pimpinan_prodi" class="block text-sm font-medium text-gray-400 mb-2">Program Studi (Opsional)</label>
+                            <input id="pimpinan_prodi" type="text" name="prodi" value="{{ old('prodi') }}" maxlength="255" class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none" placeholder="Contoh: Teknik Elektro">
+                        </div>
+                        <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-400 mb-2">Upload Foto (Format PNG Transparan)</label>
                             <input type="file" name="foto" accept="image/png, image/jpeg, image/webp" data-blob-folder="pimpinan" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-yellow-500 file:text-black hover:file:bg-yellow-400">
                         </div>
@@ -277,6 +281,10 @@
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-400 mb-2">Jabatan</label>
                             <input type="text" name="jabatan" required class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none" placeholder="Contoh: Kepala Divisi / Staff">
+                        </div>
+                        <div class="mb-4">
+                            <label for="anggota_prodi" class="block text-sm font-medium text-gray-400 mb-2">Program Studi (Opsional)</label>
+                            <input id="anggota_prodi" type="text" name="prodi" value="{{ old('prodi') }}" maxlength="255" class="w-full bg-black border border-zinc-700 rounded px-4 py-2 text-white focus:border-yellow-500 outline-none" placeholder="Contoh: Teknik Elektro">
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-400 mb-2">Deskripsi Singkat</label>

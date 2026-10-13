@@ -98,6 +98,62 @@ class ContentManagementTest extends TestCase
         $this->get(route('home'))->assertDontSee('Bergabung dengan HMVE');
     }
 
+    public function test_admin_can_save_and_display_programs_of_study_for_leaders_and_members(): void
+    {
+        $admin = $this->createAdmin();
+        $this->actingAs($admin);
+
+        $unit = app(JsonStore::class)->create('units', [
+            'nama' => 'Divisi Pengujian',
+            'slug' => 'divisi-pengujian',
+            'kategori' => 'Divisi',
+            'deskripsi' => 'Unit untuk pengujian.',
+        ]);
+
+        $this->get(route('admin.dashboard', ['tab' => 'pimpinan']))
+            ->assertOk()
+            ->assertSee('Program Studi (Opsional)');
+        $this->get(route('admin.dashboard', ['tab' => 'anggota']))
+            ->assertOk()
+            ->assertSee('Program Studi (Opsional)');
+
+        $this->post(route('admin.pimpinan.store'), [
+            'nama' => 'Ketua Pengujian',
+            'posisi' => 'Ketua Himpunan',
+            'prodi' => 'Teknik Elektro',
+        ])->assertRedirect(route('admin.dashboard', ['tab' => 'pimpinan']));
+
+        $this->post(route('admin.anggota.store'), [
+            'unit_id' => $unit->id,
+            'nama' => 'Kepala Pengujian',
+            'jabatan' => 'Kepala Divisi',
+            'prodi' => 'Teknik Elektronika',
+        ])->assertRedirect(route('admin.dashboard', ['tab' => 'anggota']));
+
+        $this->post(route('admin.anggota.store'), [
+            'unit_id' => $unit->id,
+            'nama' => 'Staf Pengujian',
+            'jabatan' => 'Staff',
+            'prodi' => 'Teknik Informatika',
+        ])->assertRedirect(route('admin.dashboard', ['tab' => 'anggota']));
+
+        $president = app(JsonStore::class)->first('pimpinans');
+        $members = app(JsonStore::class)->all('anggotas');
+        $this->assertSame('Teknik Elektro', $president->prodi);
+        $this->assertSame('Teknik Elektronika', $members->first()->prodi);
+        $this->assertSame('Teknik Informatika', $members->last()->prodi);
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('Teknik Elektro')
+            ->assertSee('Teknik Elektronika');
+
+        $this->get(route('unit.detail', $unit->slug))
+            ->assertOk()
+            ->assertSee('Teknik Elektronika')
+            ->assertSee('Teknik Informatika');
+    }
+
     private function createAdmin(): User
     {
         $record = app(JsonStore::class)->create('users', [
