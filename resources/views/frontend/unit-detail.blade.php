@@ -41,7 +41,7 @@
                 <div data-reveal class="group flex flex-col items-start">
                     <div class="relative w-full aspect-[4/5] mb-6 overflow-hidden bg-black rounded-sm">
                         @if($a->image_url)
-                        <img src="{{ filter_var($a->image_url, FILTER_VALIDATE_URL) ? $a->image_url : asset($a->image_url) }}" alt="{{ $a->nama }}" class="w-full h-full object-contain p-4">
+                        <img src="{{ filter_var($a->image_url, FILTER_VALIDATE_URL) ? $a->image_url : asset($a->image_url) }}" alt="{{ $a->nama }}" class="w-full h-full object-cover">
                         @else
                         <div class="w-full h-full flex items-center justify-center text-6xl font-bold text-zinc-700">{{ mb_substr($a->nama, 0, 1) }}</div>
                         @endif
@@ -64,7 +64,7 @@
             <div data-reveal class="group flex flex-col items-start">
                 <div class="relative w-full aspect-[4/5] mb-6 overflow-hidden bg-black rounded-sm">
                     @if($a->image_url)
-                    <img src="{{ filter_var($a->image_url, FILTER_VALIDATE_URL) ? $a->image_url : asset($a->image_url) }}" alt="{{ $a->nama }}" class="w-full h-full object-contain p-4">
+                    <img src="{{ filter_var($a->image_url, FILTER_VALIDATE_URL) ? $a->image_url : asset($a->image_url) }}" alt="{{ $a->nama }}" class="w-full h-full object-cover">
                     @else
                     <div class="w-full h-full flex items-center justify-center text-6xl font-bold text-zinc-700">{{ mb_substr($a->nama, 0, 1) }}</div>
                     @endif

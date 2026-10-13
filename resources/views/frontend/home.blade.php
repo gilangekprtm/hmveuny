@@ -194,7 +194,7 @@
                 <div class="bg-zinc-950 border border-zinc-800 rounded-sm overflow-hidden group">
                     <div class="relative w-full aspect-[4/5] bg-zinc-950 flex items-center justify-center overflow-hidden">
                         @if($p->image_url)
-                        <img src="{{ filter_var($p->image_url, FILTER_VALIDATE_URL) ? $p->image_url : asset($p->image_url) }}" alt="{{ $p->nama }}" class="w-full h-full object-contain p-4 group-hover:scale-105 transition duration-500">
+                        <img src="{{ filter_var($p->image_url, FILTER_VALIDATE_URL) ? $p->image_url : asset($p->image_url) }}" alt="{{ $p->nama }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                         @else
                         <div class="w-full h-full flex items-center justify-center text-6xl font-bold text-zinc-700">{{ mb_substr($p->nama, 0, 1) }}</div>
                         @endif
@@ -219,7 +219,7 @@
                 <div class="bg-zinc-950 border border-zinc-800 rounded-sm overflow-hidden group">
                     <!-- Area Foto dengan penanganan PNG transparan -->
                     <div class="relative w-full aspect-[4/5] bg-zinc-950 flex items-center justify-center overflow-hidden">
-                        <img src="{{ $pim->image_url ? asset($pim->image_url) : asset('images/lang.png') }}" alt="{{ $pim->nama }}" class="w-full h-full object-contain p-4 group-hover:scale-105 transition duration-500">
+                        <img src="{{ $pim->image_url ? (filter_var($pim->image_url, FILTER_VALIDATE_URL) ? $pim->image_url : asset($pim->image_url)) : asset('images/lang.png') }}" alt="{{ $pim->nama }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
                     </div>
                     <!-- Informasi Nama & Jabatan -->
