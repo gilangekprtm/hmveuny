@@ -4,18 +4,25 @@
       "runtime": "vercel-php@0.9.0"
     }
   },
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/blob-upload",
-      "destination": "/api/blob-upload.js"
+      "src": "/api/blob-upload",
+      "dest": "/api/blob-upload.js"
     },
     {
-      "source": "/api/blob-delete",
-      "destination": "/api/blob-delete.js"
+      "src": "/api/blob-delete",
+      "dest": "/api/blob-delete.js"
     },
     {
-      "source": "/(.*)",
-      "destination": "/api/index.php"
+      "src": "^/$",
+      "dest": "/api/index.php"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.php"
     }
   ]
 }
