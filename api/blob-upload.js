@@ -10,12 +10,17 @@ export default async function handler(request, response) {
 
 	try {
 		if (request.body?.type === 'blob.generate-client-token') {
-			const appOrigin = process.env.VERCEL_URL
-				? `https://${process.env.VERCEL_URL}`
-				: process.env.APP_URL;
+			const requestOrigin = request.headers.origin;
+			const requestHost = request.headers.host;
 
-			if (!appOrigin) {
-				throw new Error('Vercel application URL is not configured.');
+			if (!requestOrigin || !requestHost) {
+				throw new Error('The upload request origin is missing.');
+			}
+
+			const appOrigin = new URL(requestOrigin);
+
+			if (appOrigin.protocol !== 'https:' || appOrigin.host.toLowerCase() !== requestHost.toLowerCase()) {
+				throw new Error('The upload request must use the application HTTPS origin.');
 			}
 
 			const authorization = await fetch(new URL('/control-panel/blob-upload-authorize', appOrigin), {
