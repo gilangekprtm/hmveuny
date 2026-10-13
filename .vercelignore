@@ -1,0 +1,6 @@
+.env
+.env.*
+storage/app/data/*.json
+storage/app/data/*.lock
+node_modules
+tests

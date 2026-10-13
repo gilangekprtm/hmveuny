@@ -1,0 +1,112 @@
+@import "tailwindcss";
+@import "toastify-js/src/toastify.css";
+
+html {
+	scroll-behavior: smooth;
+	scroll-padding-top: 5rem;
+}
+
+.toastify.hmve-toast {
+	max-width: min(28rem, calc(100vw - 2rem));
+	border-radius: 0.5rem;
+	border: 1px solid rgb(63 63 70);
+	background: rgb(24 24 27);
+	padding: 1rem 1.25rem;
+	color: rgb(244 244 245);
+	font-family: inherit;
+	box-shadow: 0 12px 32px rgb(0 0 0 / 35%);
+}
+
+.toastify.hmve-toast--success {
+	border-left: 4px solid rgb(34 197 94);
+}
+
+.toastify.hmve-toast--error {
+	border-left: 4px solid rgb(239 68 68);
+}
+
+.toastify.hmve-toast--info {
+	border-left: 4px solid rgb(234 179 8);
+}
+
+@keyframes hero-rise {
+	from {
+		opacity: 0;
+		transform: translateY(2rem);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.hero-copy {
+	animation: hero-rise 1200ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+[data-menu-panel] {
+	transform-origin: top right;
+}
+
+details[open] > [data-menu-panel] {
+	animation: menu-enter 180ms ease-out both;
+}
+
+@keyframes menu-enter {
+	from {
+		opacity: 0;
+		transform: translateY(-0.35rem) scale(0.98);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+.has-scroll-reveal [data-reveal] {
+	opacity: 0;
+	transform: translateY(1.25rem);
+	transition: opacity 650ms ease, transform 650ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.has-scroll-reveal [data-reveal].is-visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+[data-reveal-group] > :nth-child(2) {
+	transition-delay: 80ms;
+}
+
+[data-reveal-group] > :nth-child(3) {
+	transition-delay: 160ms;
+}
+
+[data-reveal-group] > :nth-child(4) {
+	transition-delay: 240ms;
+}
+
+[data-reveal-group] > :nth-child(5) {
+	transition-delay: 320ms;
+}
+
+[data-reveal-group] > :nth-child(6) {
+	transition-delay: 400ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		scroll-behavior: auto !important;
+		transition-duration: 0.01ms !important;
+	}
+
+	.hero-copy {
+		animation: none;
+	}
+}
