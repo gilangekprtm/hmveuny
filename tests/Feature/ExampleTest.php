@@ -15,4 +15,15 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function test_asset_urls_use_https_when_behind_a_tls_terminating_proxy(): void
+    {
+        config(['app.url' => 'http://hmve.test']);
+
+        $response = $this->withHeader('X-Forwarded-Proto', 'https')
+            ->get('http://hmve.test/');
+
+        $response->assertOk()
+            ->assertSee('https://hmve.test/build/assets/app-', false);
+    }
 }
